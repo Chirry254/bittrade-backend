@@ -22,13 +22,18 @@ mongoose.connect(process.env.MONGO_URI)
 // Register user
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
+  console.log("📩 Register request received:", req.body); // Log incoming data
+
   try {
     const hashed = await bcrypt.hash(password, 10);
     const user = new User({ username, password: hashed });
     await user.save();
+    console.log("✅ User saved:", user); // Log success
+
     res.status(201).json({ message: 'User registered' });
   } catch (err) {
-    res.status(500).json({ error: 'Registration failed' });
+    console.error('❌ Registration error:', err); // Log detailed error
+    res.status(500).json({ error: err.message });
   }
 });
 
