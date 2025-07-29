@@ -80,16 +80,26 @@ app.get('/api/trades/:username', async (req, res) => {
 });
 
 // Post a message
-app.post('/api/message', async (req, res) => {
-  const { user, content } = req.body;
+app.post('/api/register', async (req, res) => {
+  console.log('📩 Register request body:', req.body);  // <-- log request body
+
+  const { username, password } = req.body;
   try {
-    const msg = new Message({ user, content });
-    await msg.save();
-    res.status(201).json({ message: 'Message posted' });
+    // Check if user already exists
+    const existing = await User.findOne({ username });
+    if (existing) return res.status(400).json({ error: 'Username already exists' });
+
+    const hashed = await bcrypt.hash(password, 10);
+    const user = new User({ username, password: hashed });
+    await user.save();
+
+    res.status(201).json({ message: 'User registered' });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to post message' });
+    console.error('❌ Registration error:', err); // <-- log errors
+    res.status(500).json({ error: 'Registration failed' });
   }
 });
+
 
 // Get messages
 app.get('/api/messages', async (_req, res) => {
