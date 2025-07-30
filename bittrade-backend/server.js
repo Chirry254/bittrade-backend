@@ -110,6 +110,11 @@ app.get('/api/messages', async (_req, res) => {
   res.json(messages);
 });
 
+// Lightweight health check for uptime monitoring
+app.get('/api/ping', (_req, res) => {
+  res.status(200).send('pong');
+});
+
 // Root test
 app.get('/', (_req, res) => {
   res.send('✅ BitTrade Backend is Live!');
